@@ -1,16 +1,4 @@
-Exception in thread Thread-10:
 Traceback (most recent call last):
-  File "/root/anaconda3/lib/python3.7/threading.py", line 917, in _bootstrap_inner
-    self.run()
-  File "acquisition.py", line 120, in run
-    file = open(exchange + '/' + symbol.replace('/','').lower() + '.csv', 'a+', newline='')
-FileNotFoundError: [Errno 2] No such file or directory: 'upbit/btcusdt.csv'
-
-Exception in thread Thread-11:
-Traceback (most recent call last):
-  File "/root/anaconda3/lib/python3.7/threading.py", line 917, in _bootstrap_inner
-    self.run()
-  File "acquisition.py", line 120, in run
-    file = open(exchange + '/' + symbol.replace('/','').lower() + '.csv', 'a+', newline='')
-FileNotFoundError: [Errno 2] No such file or directory: 'binance/btcusdt.csv'
-
+  File "acquisition.py", line 142, in <module>
+    mkdir()
+TypeError: mkdir() missing 1 required positional argument: 'name_list'
