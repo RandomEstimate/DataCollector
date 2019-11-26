@@ -43,6 +43,13 @@ def get_time_info(name_list,symbol_list):
     return time_dict
 
 
+def mkdir(name_list):
+    for name in name_list:
+        if not os.path.exists(name):
+            os.mkdir(name)
+    
+
+
 class CrawlInfo(Thread):
 
     def __init__(self, obj, info_queue, exchange):
@@ -132,6 +139,7 @@ if __name__ == '__main__':
     obj_list = [ccxt.okex(),ccxt.huobipro(),ccxt.binance(),ccxt.bitmax(),ccxt.fcoin(),ccxt.upbit()]
     name_list = ['okex','huobipro','binance','bitmax','fcoin','upbit']
     symbol_list = ['BTC/USDT', 'ETH/USDT','EOS/USDT','LTC/USDT','BCH/USDT','ETC/USDT','XRP/USDT']
+    mkdir()
     time_info = get_time_info(name_list,symbol_list)
     
     info_queue = Queue()
