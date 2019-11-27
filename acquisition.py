@@ -14,6 +14,7 @@ import ccxt
 import os
 import csv
 import time
+import json
 
 def get_time_info(name_list,symbol_list):		
     time_dict = {}
@@ -140,7 +141,7 @@ if __name__ == '__main__':
 	
     obj_list = [ccxt.okex(),ccxt.huobipro(),ccxt.binance(),ccxt.bitmax(),ccxt.fcoin(),ccxt.upbit()]
     file = open('config.txt','r')
-    config = file.read()
+    config = json.loads(file.read())
     file.close()
     mkdir(config['name_list'])
     time_info = get_time_info(config['name_list'],config['symbol_list'])
