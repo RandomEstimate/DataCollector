@@ -1,0 +1,1 @@
+{"name_list": ["okex", "huobipro", "binance", "bitmax", "fcoin", "upbit"], "symbol_list": ["BTC/USDT", "ETH/USDT", "EOS/USDT", "LTC/USDT", "BCH/USDT", "ETC/USDT", "XRP/USDT"]}

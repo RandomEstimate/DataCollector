@@ -9,7 +9,7 @@ def git_update():
     if json.loads(request.form.to_dict()['payload'])['commits'][0]['message'] == 'version_update':
         os.system('git pull')
         if os.path.exists('pidfile.txt'):
-            os.system("kill - 9 `cat pidfile.txt`")
+            os.system("kill -9 `cat pidfile.txt`")
         os.system('nohup python acquisition.py > logfile.txt & echo $! > pidfile.txt')
         os.system('git add .')
         os.system('git commit -m "daily update"')
