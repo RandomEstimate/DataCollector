@@ -16,5 +16,5 @@
    >
    > 录入数据内容
    >
-   > ​	【'time', 'open', 'high', 'low', 'close', 'volume'】
+   > ​	【'timestampe', 'open', 'high', 'low', 'close', 'volume','time'】
 
