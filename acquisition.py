@@ -13,12 +13,13 @@ import pandas as pd
 import ccxt
 import os
 import csv
+import time
+
 def get_time_info(name_list,symbol_list):		
     time_dict = {}
     for name in name_list:
         for symbol in symbol_list:
-            if os.path.exists(name + '/' + symbol.replace('/','').lower() + '.csv'):
-            
+            if os.path.exists(name + '/' + symbol.replace('/','').lower() + '.csv'):     
                 file = open(name + '/' + symbol.replace('/','').lower() + '.csv', 'a+', newline='')
                 file.seek(0, 0)
                 reader = csv.reader(file, delimiter=' ')
@@ -32,9 +33,7 @@ def get_time_info(name_list,symbol_list):
                 else:
                     time_dict.update({
                             name + symbol:'1374744100000'
-                            })
-               
-                
+                            })     
             else:
                 
                 time_dict.update({
@@ -48,18 +47,29 @@ def mkdir(name_list):
         if not os.path.exists(name):
             os.mkdir(name)
     
+class Update(Thread):
+    def __init__(self, obj, info_queue, exchange):
 
+        Thread.__init__(self)
+    def run(self):
+        while 1:
+            time.sleep(720)
+            os.system('git pull')
+            os.system('git add .')
+            os.system('git commit -m "daily update"')
+            os.system('git push')
+            
 
 class CrawlInfo(Thread):
 
-    def __init__(self, obj, info_queue, exchange):
+    def __init__(self, obj, info_queue, exchange,symbol_list):
 
         Thread.__init__(self)
         self.obj = obj
         self.req = requests.session()
         self.info_queue = info_queue
         self.exchange = exchange
-        self.symbol_list = ['BTC/USDT', 'ETH/USDT','EOS/USDT','LTC/USDT','BCH/USDT','ETC/USDT','XRP/USDT']
+        self.symbol_list = symbol_list
 
     def run(self):
         while 1:
@@ -96,58 +106,51 @@ class Parse(Thread):
         
         while 1:
             if self.info_queue.empty() == False:
-
                 tmp = self.info_queue.get()
-
                 exchange = tmp['exchange']
-                
                 symbol = tmp['symbol']
-
                 data = tmp['text']
-
                 data = pd.DataFrame(data)
-
                 data.columns = ['time', 'open', 'high', 'low', 'close', 'volume']
-                
                 data = data[:-1]
-                
                 data = data[data['time'].astype(int) > int(time_info[exchange + symbol])]
-                
-    
                 if not data.empty:
-                    
-                    data = data.sort_values(by='time').reset_index(drop=True)
-                    
-                    data['timestamp'] = data.time.apply(lambda x: self.timestamp2iso(str(x)[:-3]))
-                
+                    data = data.sort_values(by='time').reset_index(drop=True)                   
+                    data['timestamp'] = data.time.apply(lambda x: self.timestamp2iso(str(x)[:-3]))                
                     time_info.update({
                             exchange + symbol : data['time'][len(data)-1]
                             })
-                    
-                    file = open(exchange + '/' + symbol.replace('/','').lower() + '.csv', 'a+', newline='')
-                    write = csv.writer(file, dialect='excel')
-                    for i in range(len(data)):
-                        write.writerow(data.iloc[i])
-                    file.close()                
-					
-                time.sleep(1.5)
+                    if not os.path.exists(exchange + '/' + symbol.replace('/','').lower() + '.csv'):
+                        file = open(exchange + '/' + symbol.replace('/','').lower() + '.csv', 'a+', newline='')
+                        write = csv.writer(file, dialect='excel')
+                        write.writerow(['timestampe', 'open', 'high', 'low', 'close', 'volume','time'])
+                        for i in range(len(data)):
+                            write.writerow(data.iloc[i])
+                        file.close()     
+                    else:
+                        file = open(exchange + '/' + symbol.replace('/','').lower() + '.csv', 'a+', newline='')
+                        write = csv.writer(file, dialect='excel')
+                        for i in range(len(data)):
+                            write.writerow(data.iloc[i])
+                        file.close()                          				
+                time.sleep(1)
 
 
 if __name__ == '__main__':
 	
-    
     obj_list = [ccxt.okex(),ccxt.huobipro(),ccxt.binance(),ccxt.bitmax(),ccxt.fcoin(),ccxt.upbit()]
-    name_list = ['okex','huobipro','binance','bitmax','fcoin','upbit']
-    symbol_list = ['BTC/USDT', 'ETH/USDT','EOS/USDT','LTC/USDT','BCH/USDT','ETC/USDT','XRP/USDT']
-    mkdir()
-    time_info = get_time_info(name_list,symbol_list)
-    
+    file = open('config.txt','r')
+    config = file.read()
+    file.close()
+    mkdir(config['name_list'])
+    time_info = get_time_info(config['name_list'],config['symbol_list'])
     info_queue = Queue()
-	
-    for obj, name in zip(obj_list, name_list):
-        crawl = CrawlInfo(obj, info_queue,name)
+    for obj, name in zip(obj_list, config['name_list']):
+        crawl = CrawlInfo(obj, info_queue,name,config['symbol_list'])
         crawl.start()
-    for i in range(5):
+    for i in range(3):
         Parse_thread = Parse(info_queue)
         Parse_thread.start()
-    Parse_thread.join()
+    Update_thread = Update()
+    Update_thread.start()
+    Update_thread.join()
