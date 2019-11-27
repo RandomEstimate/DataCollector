@@ -4,7 +4,7 @@
 
    > 录入交易所：
    >
-   > ​	【okex、huobipro、binance、fcoin】
+   > ​	【okex、huobipro、binance、fcoin、upbit】
    >
    > 录入现货交易对
    >
