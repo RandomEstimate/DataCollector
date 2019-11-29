@@ -54,7 +54,7 @@ class Update(Thread):
         Thread.__init__(self)
     def run(self):
         while 1:
-            time.sleep(60*60*12)
+            time.sleep(3600*12)
             os.system('git pull')
             os.system('git add .')
             os.system('git commit -m "daily update"')
