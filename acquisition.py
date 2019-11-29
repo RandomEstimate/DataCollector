@@ -49,7 +49,7 @@ def mkdir(name_list):
             os.mkdir(name)
     
 class Update(Thread):
-    def __init__(self, obj, info_queue, exchange):
+    def __init__(self):
 
         Thread.__init__(self)
     def run(self):
